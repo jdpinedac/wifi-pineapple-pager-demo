@@ -30,7 +30,7 @@ demos/demo-av-evil-twin/
 
 | Dispositivo | Rol | Notas |
 |---|---|---|
-| **WiFi Pineapple Pager** | Ejecuta el ataque (deauth, evil twin, portal) | Firmware actualizado, SD card insertada |
+| **WiFi Pineapple Pager** | Ejecuta el ataque (deauth, evil twin, portal) | Firmware actualizado |
 | **Linksys WRT54GL** | Router victima — red AV simulada | Cualquier router WiFi 2.4 GHz sirve |
 | **Tablet/laptop victima** | Dispositivo que se conecta al Evil Twin | Auto-Join ON, MAC randomization OFF |
 
@@ -345,7 +345,7 @@ ssh root@172.16.42.1 "echo -n > /root/loot/av_demo/credentials.log && \
 
 ### WiFi Pineapple Pager
 
-- [ ] Firmware actualizado, SD card insertada
+- [ ] Firmware actualizado
 - [ ] Payload 1 ejecutado exitosamente (portal configurado)
 - [ ] Portal verificado: `http://172.16.52.1/` muestra login AV
 - [ ] Test de credenciales exitoso

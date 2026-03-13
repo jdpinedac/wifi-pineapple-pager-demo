@@ -26,7 +26,7 @@ demos/demo-av-dos/
 
 | Dispositivo | Rol | Notas |
 |---|---|---|
-| **WiFi Pineapple Pager** | Ejecuta el ataque deauth | Firmware actualizado, SD card insertada |
+| **WiFi Pineapple Pager** | Ejecuta el ataque deauth | Firmware actualizado |
 | **Linksys WRT54GL** | Router victima — red AV simulada | Cualquier router WiFi 2.4 GHz sirve |
 | **Laptop (Linux Mint)** | Servidor HTTP para el dashboard | Conectada por **Ethernet** al router |
 | **iPad Pro** | Muestra el dashboard AV al publico | Conectado por WiFi al router |
@@ -288,7 +288,7 @@ Estos valores estan al inicio de `payload.sh` y se pueden modificar antes de des
 
 ### WiFi Pineapple Pager
 
-- [ ] Firmware actualizado, SD card insertada
+- [ ] Firmware actualizado
 - [ ] Payload copiado a `/mmc/root/payloads/recon/access_point/av_dos_attack/`
 - [ ] Pager encendido, Recon muestra la red `AV-Stream`
 
