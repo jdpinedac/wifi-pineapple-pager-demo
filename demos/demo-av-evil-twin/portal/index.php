@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usuario'])) {
             <div class="progress-bar" id="progress"></div>
         </div>
         <p class="status" id="status">Inicializando conexión...</p>
-        <p class="brand">AV Control Network | Crestron DM-NVX | v4.2.1</p>
+        <p class="brand">AV Control Network | AVIXA AV-over-IP | v4.2.1</p>
     </div>
     <script>
         var target = ' . json_encode($target) . ';
@@ -298,7 +298,7 @@ echo '<!DOCTYPE html>
             <button type="submit">Iniciar Sesión</button>
         </form>
         <p class="info-bar">
-            Sala: Ballroom A &nbsp;|&nbsp; Sistema: Crestron DM-NVX &nbsp;|&nbsp; v4.2.1
+            Sala: Ballroom A &nbsp;|&nbsp; Sistema: AVIXA AV-over-IP &nbsp;|&nbsp; v4.2.1
         </p>
     </div>
     <p class="footer">AV Control Network &copy; 2026 &mdash; Acceso autorizado únicamente</p>

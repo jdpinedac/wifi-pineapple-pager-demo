@@ -1,6 +1,6 @@
 # Demo AV Evil Twin — BICSI-CALA 2026
 
-Demo en vivo (~60 segundos) mostrando **Evil Twin + Portal Cautivo** sobre una red AV simulada. El Pager desautentica a la victima de su red legitima, activa un Evil Twin con el mismo SSID, y sirve un portal que imita el login de un sistema AV profesional (Crestron DM-NVX). Las credenciales ingresadas por la victima aparecen en la pantalla del Pager.
+Demo en vivo (~60 segundos) mostrando **Evil Twin + Portal Cautivo** sobre una red AV simulada. El Pager desautentica a la victima de su red legitima, activa un Evil Twin con el mismo SSID, y sirve un portal que imita el login de un sistema AV profesional (AVIXA AV-over-IP). Las credenciales ingresadas por la victima aparecen en la pantalla del Pager.
 
 ## Que demuestra
 
@@ -279,7 +279,7 @@ ssh root@172.16.42.1 "echo -n > /root/loot/av_demo/credentials.log && \
 
 ### Guia para el presentador
 
-> **Tip:** Antes de empezar, mostrar al publico que el dispositivo victima esta conectado normalmente a una red WiFi llamada "AV-Control". Explicar que simula la red de un sistema de control AV (tipo Crestron, Extron, etc.). Luego sacar el Pineapple Pager.
+> **Tip:** Antes de empezar, mostrar al publico que el dispositivo victima esta conectado normalmente a una red WiFi llamada "AV-Control". Explicar que simula la red de un sistema de control AV (tipo AVIXA AV-over-IP). Luego sacar el Pineapple Pager.
 
 | Paso | Accion del presentador | Lo que pasa en el Pager | Lo que pasa en la victima |
 |---|---|---|---|
