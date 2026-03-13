@@ -13,8 +13,8 @@ Demos en vivo para la conferencia [BICSI-CALA 2026](https://www.bicsicala.org/) 
 
 | Demo | Descripcion | Duración |
 |---|---|---|
-| [AV Evil Twin](demos/av-evil-twin/) | Clona un SSID AV, desautentica clientes y sirve un portal cautivo que captura credenciales | ~60s |
-| [AV DoS](demos/av-dos/) | Deauth cíclico contra un stream AV — el iPad muestra congelamiento y recuperación en vivo | ~55s |
+| [AV Evil Twin](demos/demo-av-evil-twin/) | Clona un SSID AV, desautentica clientes y sirve un portal cautivo que captura credenciales | ~60s |
+| [AV DoS](demos/demo-av-dos/) | Deauth cíclico contra un stream AV — el iPad muestra congelamiento y recuperación en vivo | ~55s |
 
 ## Hardware
 
@@ -27,14 +27,14 @@ Demos en vivo para la conferencia [BICSI-CALA 2026](https://www.bicsicala.org/) 
 
 ```
 demos/
-├── av-evil-twin/                   # Demo 1: Evil Twin + Portal Cautivo
+├── demo-av-evil-twin/              # Demo 1: Evil Twin + Portal Cautivo
 │   ├── payloads/
 │   │   ├── 1_setup_portal/         # Setup pre-demo (requiere internet)
 │   │   ├── 2_deauth_and_twin/      # Deauth + clonación SSID
 │   │   └── 3_credential_alert/     # Alerta al capturar credenciales
 │   ├── portal/                     # Portal cautivo (PHP)
 │   └── README.md
-└── av-dos/                         # Demo 2: DoS de Stream AV
+└── demo-av-dos/                    # Demo 2: DoS de Stream AV
     ├── payloads/
     │   └── 1_av_dos_attack/        # Deauth cíclico por tiempo
     ├── stream/                     # Dashboard + servidor HTTP
