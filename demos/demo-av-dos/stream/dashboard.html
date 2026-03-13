@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>AV System Monitor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: #0d1b2a;
+            color: white;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ─── Header ─────────────────────────────────────────────────────── */
+        .header {
+            background: #1e3a5f;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #2196F3;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 36px;
+            height: 36px;
+            background: #2196F3;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .header .subtitle {
+            font-size: 12px;
+            color: #2196F3;
+            font-weight: 400;
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .header-right .clock {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ─── Main layout ────────────────────────────────────────────────── */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            grid-template-rows: 1fr auto;
+            gap: 16px;
+            padding: 16px;
+            height: calc(100vh - 72px);
+        }
+
+        /* ─── Video area ─────────────────────────────────────────────────── */
+        .video-panel {
+            background: #1e3a5f;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            grid-row: 1 / 3;
+        }
+
+        .video-label {
+            position: absolute;
+            top: 12px;
+            left: 14px;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            z-index: 2;
+        }
+
+        .video-label .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: blink-dot 2s infinite;
+        }
+
+        .video-label .dot.offline { background: #f44336; animation: none; }
+
+        @keyframes blink-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        canvas#smpte {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* ─── Signal lost overlay ────────────────────────────────────────── */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* TV static noise via CSS */
+        .overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255,255,255,0.03) 2px,
+                rgba(255,255,255,0.03) 4px
+            );
+            animation: scanlines 0.1s steps(3) infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        .overlay .noise {
+            position: absolute;
+            inset: 0;
+            opacity: 0.08;
+            animation: noise 0.15s steps(5) infinite;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+        }
+
+        @keyframes noise {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-10px, 5px); }
+            40% { transform: translate(7px, -8px); }
+            60% { transform: translate(-5px, 12px); }
+            80% { transform: translate(11px, -3px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .overlay .signal-text {
+            font-size: 42px;
+            font-weight: 800;
+            color: #f44336;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            animation: pulse-text 1.2s ease-in-out infinite;
+            z-index: 1;
+            text-shadow: 0 0 20px rgba(244,67,54,0.5);
+        }
+
+        .overlay .signal-sub {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 12px;
+            z-index: 1;
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ─── Connected flash ────────────────────────────────────────────── */
+        .connected-flash {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            padding: 16px 40px;
+            border-radius: 12px;
+            z-index: 15;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+
+        .connected-flash.active {
+            opacity: 1;
+        }
+
+        /* ─── Metrics panel ──────────────────────────────────────────────── */
+        .metrics-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .metric-card {
+            background: #1e3a5f;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .metric-card .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 6px;
+        }
+
+        .metric-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-card .value.connected { color: #4CAF50; }
+        .metric-card .value.disconnected { color: #f44336; }
+
+        .metric-card .value-sm {
+            font-size: 20px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ─── Quality bar ────────────────────────────────────────────────── */
+        .quality-panel {
+            background: #1e3a5f;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .quality-panel .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+        }
+
+        .quality-bar-bg {
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .quality-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            background: #4CAF50;
+            transition: width 0.5s ease, background 0.5s ease;
+            width: 95%;
+        }
+
+        .quality-text {
+            font-size: 12px;
+            margin-top: 6px;
+            color: rgba(255,255,255,0.6);
+            text-align: right;
+        }
+
+        /* ─── Responsive ─────────────────────────────────────────────────── */
+        @media (max-width: 768px) {
+            .main {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto auto;
+            }
+            .video-panel { min-height: 300px; grid-row: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <div class="header-icon">&#9654;</div>
+        <div>
+            <h1>MONITOR DE SISTEMA AV</h1>
+            <div class="subtitle">Crestron DM-NVX | Red: AV-Stream</div>
+        </div>
+    </div>
+    <div class="header-right">
+        <div class="clock" id="clock">--:--:--</div>
+        <div>Sala: Ballroom A</div>
+    </div>
+</div>
+
+<div class="main">
+    <!-- Video area -->
+    <div class="video-panel">
+        <div class="video-label">
+            <span class="dot" id="liveDot"></span>
+            <span id="liveLabel">EN VIVO</span>
+        </div>
+        <canvas id="smpte"></canvas>
+
+        <!-- Signal lost overlay -->
+        <div class="overlay" id="overlay">
+            <div class="noise"></div>
+            <div class="signal-text">SEÑAL PERDIDA</div>
+            <div class="signal-sub">Verificando conexión con el sistema AV...</div>
+        </div>
+
+        <!-- Connected flash -->
+        <div class="connected-flash" id="connectedFlash">CONECTADO</div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metrics-panel">
+        <div class="metric-card">
+            <div class="label">Estado de conexión</div>
+            <div class="value connected" id="statusText">CONECTADO</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Latencia</div>
+            <div class="value-sm" id="latencyText">-- ms</div>
+        </div>
+        <div class="metric-card">
+            <div class="label">Tiempo activo</div>
+            <div class="value-sm" id="uptimeText">00:00:00</div>
+        </div>
+
+        <!-- Quality bar -->
+        <div class="quality-panel">
+            <div class="label">Calidad de conexión</div>
+            <div class="quality-bar-bg">
+                <div class="quality-bar-fill" id="qualityBar"></div>
+            </div>
+            <div class="quality-text" id="qualityText">Excelente — 95%</div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // ─── Elements ───────────────────────────────────────────────────────
+    var overlay       = document.getElementById('overlay');
+    var connFlash     = document.getElementById('connectedFlash');
+    var statusText    = document.getElementById('statusText');
+    var latencyText   = document.getElementById('latencyText');
+    var uptimeText    = document.getElementById('uptimeText');
+    var qualityBar    = document.getElementById('qualityBar');
+    var qualityText   = document.getElementById('qualityText');
+    var liveDot       = document.getElementById('liveDot');
+    var liveLabel     = document.getElementById('liveLabel');
+    var clockEl       = document.getElementById('clock');
+    var canvas        = document.getElementById('smpte');
+    var ctx           = canvas.getContext('2d');
+
+    // ─── State ──────────────────────────────────────────────────────────
+    var isConnected    = true;
+    var failCount      = 0;
+    var uptimeStart    = Date.now();
+    var flashTimeout   = null;
+    var FAIL_THRESHOLD = 2;  // consecutive failures before "signal lost"
+    var POLL_MS        = 500;
+
+    // ─── Clock ──────────────────────────────────────────────────────────
+    function updateClock() {
+        var d = new Date();
+        clockEl.textContent = d.toLocaleTimeString('es-CR', { hour12: false });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ─── SMPTE color bars ───────────────────────────────────────────────
+    var SMPTE_COLORS = [
+        '#c0c0c0', '#c0c000', '#00c0c0', '#00c000',
+        '#c000c0', '#c00000', '#0000c0'
+    ];
+
+    var barPhase = 0;
+
+    function drawSMPTE() {
+        var w = canvas.width;
+        var h = canvas.height;
+        var barW = w / SMPTE_COLORS.length;
+
+        // Main bars (top 70%)
+        var mainH = h * 0.7;
+        for (var i = 0; i < SMPTE_COLORS.length; i++) {
+            ctx.fillStyle = SMPTE_COLORS[i];
+            ctx.fillRect(i * barW, 0, barW + 1, mainH);
+        }
+
+        // Castellated bars (next 10%)
+        var castH = h * 0.1;
+        var castColors = ['#0000c0', '#131313', '#c000c0', '#131313', '#00c0c0', '#131313', '#c0c0c0'];
+        for (var j = 0; j < castColors.length; j++) {
+            ctx.fillStyle = castColors[j];
+            ctx.fillRect(j * barW, mainH, barW + 1, castH);
+        }
+
+        // Bottom bars (bottom 20%)
+        var botY = mainH + castH;
+        var botH = h - botY;
+        var segments = [
+            { color: '#00214c', w: barW * 1.5 },
+            { color: '#ffffff', w: barW * 1 },
+            { color: '#32006a', w: barW * 1.5 },
+            { color: '#131313', w: barW * 3 }
+        ];
+        var bx = 0;
+        for (var k = 0; k < segments.length; k++) {
+            ctx.fillStyle = segments[k].color;
+            ctx.fillRect(bx, botY, segments[k].w + 1, botH);
+            bx += segments[k].w;
+        }
+
+        // Subtle animation: moving scanline
+        barPhase = (barPhase + 2) % h;
+        ctx.fillStyle = 'rgba(255,255,255,0.03)';
+        ctx.fillRect(0, barPhase, w, 3);
+    }
+
+    function resizeCanvas() {
+        var rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * (window.devicePixelRatio || 1);
+        canvas.height = rect.height * (window.devicePixelRatio || 1);
+        drawSMPTE();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    setInterval(drawSMPTE, 50);
+
+    // ─── Uptime ─────────────────────────────────────────────────────────
+    function updateUptime() {
+        if (!isConnected) return;
+        var elapsed = Math.floor((Date.now() - uptimeStart) / 1000);
+        var hh = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+        var mm = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+        var ss = String(elapsed % 60).padStart(2, '0');
+        uptimeText.textContent = hh + ':' + mm + ':' + ss;
+    }
+    setInterval(updateUptime, 1000);
+
+    // ─── Connection detection ───────────────────────────────────────────
+    function setConnected(latency) {
+        failCount = 0;
+
+        if (!isConnected) {
+            // Transition: disconnected → connected
+            isConnected = true;
+            overlay.classList.remove('active');
+
+            // Flash "CONECTADO"
+            connFlash.classList.add('active');
+            if (flashTimeout) clearTimeout(flashTimeout);
+            flashTimeout = setTimeout(function() {
+                connFlash.classList.remove('active');
+            }, 2000);
+
+            uptimeStart = Date.now();
+        }
+
+        statusText.textContent = 'CONECTADO';
+        statusText.className = 'value connected';
+        latencyText.textContent = latency + ' ms';
+        liveDot.className = 'dot';
+        liveLabel.textContent = 'EN VIVO';
+
+        // Quality based on latency
+        var quality;
+        if (latency < 50) quality = 95;
+        else if (latency < 150) quality = 75;
+        else if (latency < 300) quality = 50;
+        else quality = 30;
+
+        // Add slight variation
+        quality = Math.min(100, Math.max(10, quality + Math.floor(Math.random() * 6 - 3)));
+
+        qualityBar.style.width = quality + '%';
+        if (quality > 70) {
+            qualityBar.style.background = '#4CAF50';
+            qualityText.textContent = 'Excelente — ' + quality + '%';
+        } else if (quality > 40) {
+            qualityBar.style.background = '#FF9800';
+            qualityText.textContent = 'Aceptable — ' + quality + '%';
+        } else {
+            qualityBar.style.background = '#f44336';
+            qualityText.textContent = 'Degradada — ' + quality + '%';
+        }
+    }
+
+    function setDisconnected() {
+        failCount++;
+        if (failCount < FAIL_THRESHOLD) return;
+
+        if (isConnected) {
+            isConnected = false;
+            overlay.classList.add('active');
+            connFlash.classList.remove('active');
+        }
+
+        statusText.textContent = 'DESCONECTADO';
+        statusText.className = 'value disconnected';
+        latencyText.textContent = '-- ms';
+        liveDot.className = 'dot offline';
+        liveLabel.textContent = 'SIN SEÑAL';
+        qualityBar.style.width = '0%';
+        qualityBar.style.background = '#f44336';
+        qualityText.textContent = 'Sin conexión — 0%';
+    }
+
+    // ─── Poll server ────────────────────────────────────────────────────
+    function poll() {
+        var start = Date.now();
+
+        fetch('/?t=' + Date.now(), { cache: 'no-store', mode: 'no-cors' })
+            .then(function() {
+                var latency = Date.now() - start;
+                setConnected(latency);
+            })
+            .catch(function() {
+                setDisconnected();
+            });
+    }
+
+    setInterval(poll, POLL_MS);
+    poll();
+})();
+</script>
+</body>
+</html>

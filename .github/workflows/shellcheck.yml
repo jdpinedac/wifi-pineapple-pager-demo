@@ -1,0 +1,26 @@
+name: ShellCheck
+
+on:
+  push:
+    branches: [main]
+    paths: ['**/*.sh']
+  pull_request:
+    branches: [main]
+    paths: ['**/*.sh']
+
+jobs:
+  shellcheck:
+    name: Lint Shell Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Find and lint shell scripts
+        run: |
+          echo "::group::Scripts found"
+          find demos/ -name '*.sh' -type f
+          echo "::endgroup::"
+          find demos/ -name '*.sh' -type f -exec shellcheck --severity=warning --shell=bash {} +

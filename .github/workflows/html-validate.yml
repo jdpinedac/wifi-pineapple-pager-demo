@@ -1,0 +1,31 @@
+name: HTML Validate
+
+on:
+  push:
+    branches: [main]
+    paths: ['**/*.html']
+  pull_request:
+    branches: [main]
+    paths: ['**/*.html']
+
+jobs:
+  html-validate:
+    name: Validate HTML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install HTMLHint
+        run: npm install -g htmlhint
+
+      - name: Validate HTML files
+        run: |
+          echo "::group::HTML files found"
+          find demos/ -name '*.html' -type f
+          echo "::endgroup::"
+          find demos/ -name '*.html' -type f -exec htmlhint {} +
