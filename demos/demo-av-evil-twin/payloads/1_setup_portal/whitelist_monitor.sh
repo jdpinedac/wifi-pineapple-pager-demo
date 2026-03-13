@@ -8,6 +8,7 @@ WHITELIST_FILE="/tmp/av_demo_whitelist.txt"
 PROCESSED_FILE="/tmp/av_demo_processed.txt"
 CREDENTIALS_FILE="/root/loot/av_demo/credentials.log"
 LOOTDIR="/root/loot/av_demo"
+# shellcheck disable=SC2034  # used by sourcing scripts
 PORTAL_IP="172.16.52.1"
 SLEEP_INTERVAL=1
 

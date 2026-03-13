@@ -35,7 +35,7 @@ LOG ""
 # ─── Confirm attack ───────────────────────────────────────────────────────────
 resp=$(CONFIRMATION_DIALOG "ATACAR RED AV?\n\nSSID: $_RECON_SELECTED_AP_SSID\nBSSID: $_RECON_SELECTED_AP_BSSID\nCanal: $_RECON_SELECTED_AP_CHANNEL\n\nSe clonará el SSID y se desautenticará a los clientes.")
 case $? in
-    $DUCKYSCRIPT_CANCELLED|$DUCKYSCRIPT_REJECTED|$DUCKYSCRIPT_ERROR)
+    "$DUCKYSCRIPT_CANCELLED"|"$DUCKYSCRIPT_REJECTED"|"$DUCKYSCRIPT_ERROR")
         LOG "Cancelado."
         exit 0
         ;;

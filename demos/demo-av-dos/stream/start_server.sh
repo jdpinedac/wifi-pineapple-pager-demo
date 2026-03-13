@@ -23,5 +23,5 @@ echo ""
 echo "  Ctrl+C para detener"
 echo ""
 
-cd "$SCRIPT_DIR"
+cd "$SCRIPT_DIR" || exit 1
 python3 -m http.server "$PORT" --bind 0.0.0.0

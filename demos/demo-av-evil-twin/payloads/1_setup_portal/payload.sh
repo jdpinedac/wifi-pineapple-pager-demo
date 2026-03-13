@@ -12,6 +12,7 @@
 PORTAL_IP="172.16.52.1"
 PORTAL_ROOT="/www/av_demo"
 LOOT_DIR="/root/loot/av_demo"
+# shellcheck disable=SC2034  # used by whitelist_monitor.sh
 WHITELIST_FILE="/tmp/av_demo_whitelist.txt"
 PAYLOAD_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -282,7 +283,7 @@ if [ -f /tmp/av_demo-dns.pid ]; then
 fi
 
 # Also kill any dnsmasq on port 1053 (fallback)
-kill $(netstat -plant 2>/dev/null | grep ':1053' | awk '{print $NF}' | sed 's/\/dnsmasq//g') 2>/dev/null || true
+kill "$(netstat -plant 2>/dev/null | grep ':1053' | awk '{print $NF}' | sed 's/\/dnsmasq//g')" 2>/dev/null || true
 
 dnsmasq --no-hosts --no-resolv --address=/#/${PORTAL_IP} --dns-forward-max=1 --cache-size=0 -p 1053 --listen-address=0.0.0.0,::1 --bind-interfaces &
 DNS_PID=$!

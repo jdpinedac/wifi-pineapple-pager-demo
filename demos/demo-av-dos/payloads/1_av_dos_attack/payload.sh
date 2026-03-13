@@ -30,7 +30,7 @@ LOG ""
 # ─── Confirm attack ───────────────────────────────────────────────────────────
 resp=$(CONFIRMATION_DIALOG "ATACAR STREAM AV?\n\nSSID: $_RECON_SELECTED_AP_SSID\nBSSID: $_RECON_SELECTED_AP_BSSID\nCanal: $_RECON_SELECTED_AP_CHANNEL\n\n$CYCLE_COUNT ciclos de ${ATTACK_DURATION}s ataque / ${RECOVERY_DURATION}s pausa\nEl stream se congelará durante cada ciclo de ataque.")
 case $? in
-    $DUCKYSCRIPT_CANCELLED|$DUCKYSCRIPT_REJECTED|$DUCKYSCRIPT_ERROR)
+    "$DUCKYSCRIPT_CANCELLED"|"$DUCKYSCRIPT_REJECTED"|"$DUCKYSCRIPT_ERROR")
         LOG "Cancelado."
         exit 0
         ;;
