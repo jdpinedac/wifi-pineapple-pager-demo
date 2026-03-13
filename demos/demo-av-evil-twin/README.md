@@ -13,12 +13,11 @@ Demo en vivo (~60 segundos) mostrando **Evil Twin + Portal Cautivo** sobre una r
 
 ```
 demos/demo-av-evil-twin/
-├── portal/
-│   └── index.php                      <- Portal AV (login form + captura de credenciales)
 ├── payloads/
 │   ├── 1_setup_portal/
 │   │   ├── payload.sh                 <- Pre-demo setup (requiere internet en el Pager)
-│   │   └── whitelist_monitor.sh       <- Monitor de whitelist IP (background daemon)
+│   │   ├── whitelist_monitor.sh       <- Monitor de whitelist IP (background daemon)
+│   │   └── index.php                  <- Portal AV (login form + captura de credenciales)
 │   ├── 2_deauth_and_twin/
 │   │   └── payload.sh                 <- Deauth + Evil Twin (recon/access_point)
 │   └── 3_credential_alert/
@@ -128,7 +127,7 @@ El dispositivo victima es el que se conectara al Evil Twin durante la demo. Pued
 
 ## Paso 3 — Instalacion de payloads en el Pager
 
-Esta demo usa **3 payloads** que se despliegan en distintas ubicaciones del Pager, mas el archivo del portal (`index.php`).
+Esta demo usa **3 payloads** que se despliegan en distintas ubicaciones del Pager.
 
 ### 3.1 Conectar al Pager via USB
 
@@ -151,14 +150,11 @@ ssh root@172.16.42.1 "mkdir -p \
 Este payload instala nginx + PHP, despliega el portal cautivo y configura firewall + DNS hijack.
 
 ```bash
-# Copiar payload, whitelist monitor y portal al mismo directorio
 scp demos/demo-av-evil-twin/payloads/1_setup_portal/payload.sh \
     demos/demo-av-evil-twin/payloads/1_setup_portal/whitelist_monitor.sh \
-    demos/demo-av-evil-twin/portal/index.php \
+    demos/demo-av-evil-twin/payloads/1_setup_portal/index.php \
     root@172.16.42.1:/mmc/root/payloads/user/interception/av_demo_setup/
 ```
-
-> **Importante:** El archivo `index.php` (portal) debe copiarse al mismo directorio que `payload.sh`. El payload lo busca primero en su propio directorio.
 
 ### 3.4 Copiar Payload 2 — Deauth y Evil Twin
 
@@ -401,7 +397,7 @@ ssh root@172.16.42.1 "echo -n > /root/loot/av_demo/credentials.log && \
 
 El archivo `index.php` no se copio junto con `payload.sh`. Copiar manualmente:
 ```bash
-scp demos/demo-av-evil-twin/portal/index.php \
+scp demos/demo-av-evil-twin/payloads/1_setup_portal/index.php \
     root@172.16.42.1:/mmc/root/payloads/user/interception/av_demo_setup/
 ```
 Luego re-ejecutar el payload.
